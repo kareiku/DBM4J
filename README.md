@@ -9,6 +9,11 @@ A lightweight set of Java classes and interfaces for easy database access. Desig
 - **MySQLDatabaseManager**: Concrete database manager for MySQL connections.
 - **SQLiteDatabaseManager**: Concrete database manager for SQLite connections.
 
+## Features
+
+- Modular components, reusable across many projects
+- Lightweight and extensible design philosophy
+
 ## Usage
 
 Precompiled versions of the library can be found under the `releases/` directory. This is done to allow ease of download without requiring GitHub's GUI.
@@ -17,11 +22,6 @@ Precompiled versions of the library can be found under the `releases/` directory
 
 1. Clone the repository.
 2. Compile with Maven (`mvn compile package`).
-
-## Features
-
-- Modular components, reusable across many projects
-- Lightweight and extensible design philosophy
 
 ## Contributing
 
