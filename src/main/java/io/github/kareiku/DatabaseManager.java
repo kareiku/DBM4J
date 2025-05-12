@@ -2,17 +2,31 @@ package io.github.kareiku;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
+public class DatabaseManager implements IDatabaseManager {
+    private String url;
 
-public abstract class DatabaseManager implements IDatabaseManager {
-    protected abstract @NotNull Connection getConnection() throws SQLException;
+    public DatabaseManager() {
+        this.url = null;
+    }
+
+    @Override
+    public void setUrl(@NotNull String url) {
+        this.url = url;
+    }
+
+    @Override
+    public void setUrl(@NotNull String subprotocol, @NotNull String subname) {
+        this.url = String.format("jdbc:%s:%s", subprotocol, subname);
+    }
+
+    private @NotNull Connection getConnection() throws SQLException {
+        return DriverManager.getConnection(this.url);
+    }
 
     @Override
     public void update(@NotNull String query) throws SQLException {
@@ -23,7 +37,6 @@ public abstract class DatabaseManager implements IDatabaseManager {
             statement.executeUpdate(query);
         }
     }
-
 
     @Override
     public @NotNull Stream<Stream<?>> fetch(@NotNull String query) throws SQLException {
