@@ -5,9 +5,7 @@ A lightweight set of Java classes and interfaces for easy database access. Desig
 ## Table of Contents
 
 - **IDatabaseManager**: Interface of the database manager. Contains method signatures for fetching and updating, based on queries.
-- **DatabaseManager**: Abstract class that define how queries will return data and update tables.
-- **MySQLDatabaseManager**: Concrete database manager for MySQL connections.
-- **SQLiteDatabaseManager**: Concrete database manager for SQLite connections.
+- **DatabaseManager**: Class that provides URL setup and usage of the methods defined in the interface.
 
 ## Features
 
