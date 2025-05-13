@@ -1,16 +1,13 @@
 package io.github.kareiku;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.sql.SQLException;
 import java.util.stream.Stream;
 
 public interface IDatabaseManager {
-    void setUrl(@NotNull String url);
+    void update(@NotNull String fmt, @NotNull Object @Nullable ... args) throws SQLException;
 
-    void setUrl(@NotNull String subprotocol, @NotNull String subname);
-
-    void update(@NotNull String query) throws SQLException;
-
-    @NotNull Stream<Stream<?>> fetch(@NotNull String query) throws SQLException;
+    @NotNull Stream<@NotNull Stream<?>> fetch(@NotNull String fmt, @NotNull Object @Nullable ... args) throws SQLException;
 }
