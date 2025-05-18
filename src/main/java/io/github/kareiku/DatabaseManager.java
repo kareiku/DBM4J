@@ -27,9 +27,14 @@ public class DatabaseManager implements IDatabaseManager {
     public void update(@NotNull String fmt, @NotNull Object @Nullable ... args) throws SQLException {
         try (
                 Connection connection = this.getConnection();
-                Statement statement = connection.createStatement()
+                PreparedStatement statement = connection.prepareStatement(fmt)
         ) {
-            statement.executeUpdate(String.format(fmt, args));
+            if (args != null) {
+                for (int i = 0; i < args.length; i++) {
+                    statement.setObject(i + 1, args[i]);
+                }
+            }
+            statement.executeUpdate();
         }
     }
 
@@ -38,15 +43,22 @@ public class DatabaseManager implements IDatabaseManager {
         List<List<?>> table = new ArrayList<>();
         try (
                 Connection connection = this.getConnection();
-                Statement statement = connection.createStatement();
-                ResultSet resultSet = statement.executeQuery(String.format(fmt, args))
+                PreparedStatement statement = connection.prepareStatement(fmt)
         ) {
-            int columnCount = resultSet.getMetaData().getColumnCount();
-            while (resultSet.next()) {
-                List<Object> record = new ArrayList<>();
-                table.add(record);
-                for (int i = 1; i <= columnCount; i++) {
-                    record.add(resultSet.getObject(i));
+            if (args != null) {
+                for (int i = 0; i < args.length; i++) {
+                    statement.setObject(i + 1, args[i]);
+                }
+            }
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                int columnCount = resultSet.getMetaData().getColumnCount();
+                while (resultSet.next()) {
+                    List<Object> record = new ArrayList<>();
+                    table.add(record);
+                    for (int i = 1; i <= columnCount; i++) {
+                        record.add(resultSet.getObject(i));
+                    }
                 }
             }
         }
