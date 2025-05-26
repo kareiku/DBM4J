@@ -1,32 +1,23 @@
 package io.github.kareiku;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class DatabaseManager implements IDatabaseManager {
+public class SQLDatabaseManager implements DatabaseManager {
     private final String url;
 
-    public DatabaseManager(@NotNull String url) {
+    public SQLDatabaseManager(String url) {
         this.url = url;
     }
 
-    public DatabaseManager(@NotNull String subprotocol, @NotNull String subname) {
-        this.url = String.format("jdbc:%s:%s", subprotocol, subname);
-    }
-
-    private @NotNull Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(this.url);
-    }
-
     @Override
-    public void update(@NotNull String fmt, @NotNull Object @Nullable ... args) throws SQLException {
+    public void update(@NotNull String fmt, Object... args) throws SQLException {
         try (
-                Connection connection = this.getConnection();
+                Connection connection = DriverManager.getConnection(this.url);
                 PreparedStatement statement = connection.prepareStatement(fmt)
         ) {
             if (args != null) {
@@ -39,10 +30,10 @@ public class DatabaseManager implements IDatabaseManager {
     }
 
     @Override
-    public @NotNull Stream<@NotNull Stream<?>> fetch(@NotNull String fmt, @NotNull Object @Nullable ... args) throws SQLException {
+    public Stream<Stream<?>> fetch(@NotNull String fmt, Object... args) throws SQLException {
         List<List<?>> table = new ArrayList<>();
         try (
-                Connection connection = this.getConnection();
+                Connection connection = DriverManager.getConnection(this.url);
                 PreparedStatement statement = connection.prepareStatement(fmt)
         ) {
             if (args != null) {
