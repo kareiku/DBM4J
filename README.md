@@ -5,8 +5,7 @@ extensible.
 
 ## Usage
 
-Compiled versions of the library can be found under the `releases/` directory. This is done to allow ease of download
-without requiring any GUI.
+Compiled versions of the library can be found under the `releases/` directory.
 
 ## License
 
