@@ -1,11 +1,6 @@
 package io.github.kareiku;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Stream;
 
 public class SQLDatabaseManager implements DatabaseManager {
     private final String url;
@@ -15,44 +10,69 @@ public class SQLDatabaseManager implements DatabaseManager {
     }
 
     @Override
-    public void update(@NotNull String fmt, Object... args) throws SQLException {
+    public void create(String query, Object... args) {
+        this.update(query, args);
+    }
+
+    @Override
+    public String read(String query, Object... args) {
         try (
                 Connection connection = DriverManager.getConnection(this.url);
-                PreparedStatement statement = connection.prepareStatement(fmt)
+                PreparedStatement statement = connection.prepareStatement(query)
         ) {
-            if (args != null) {
-                for (int i = 0; i < args.length; i++) {
-                    statement.setObject(i + 1, args[i]);
-                }
+            for (int i = 0; i < args.length; i++) {
+                statement.setObject(i + 1, args[i]);
             }
-            statement.executeUpdate();
+            try (ResultSet resultSet = statement.executeQuery()) {
+                ResultSetMetaData meta = resultSet.getMetaData();
+                int columnCount = meta.getColumnCount();
+                StringBuilder json = new StringBuilder();
+                json.append('[');
+                boolean firstRow = true;
+                while (resultSet.next()) {
+                    if (!firstRow) json.append(',');
+                    json.append('{');
+                    for (int i = 1; i <= columnCount; i++) {
+                        json.append('"').append(meta.getColumnName(i)).append('"').append(':');
+                        Object value = resultSet.getObject(i);
+                        if (value == null) {
+                            json.append("null");
+                        } else if (value instanceof Number || value instanceof Boolean) {
+                            json.append(value);
+                        } else {
+                            json.append('"').append(value.toString().replace("\"", "\\\"")).append('"');
+                        }
+                        if (i < columnCount) json.append(',');
+                    }
+                    json.append('}');
+                    firstRow = false;
+                }
+                json.append(']');
+                return json.toString();
+            }
+        } catch (SQLException ex) {
+            System.err.println(ex.getMessage());
+            return "{}";
         }
     }
 
     @Override
-    public Stream<Stream<?>> fetch(@NotNull String fmt, Object... args) throws SQLException {
-        List<List<?>> table = new ArrayList<>();
+    public void update(String query, Object... args) {
         try (
                 Connection connection = DriverManager.getConnection(this.url);
-                PreparedStatement statement = connection.prepareStatement(fmt)
+                PreparedStatement statement = connection.prepareStatement(query)
         ) {
-            if (args != null) {
-                for (int i = 0; i < args.length; i++) {
-                    statement.setObject(i + 1, args[i]);
-                }
+            for (int i = 0; i < args.length; i++) {
+                statement.setObject(i + 1, args[i]);
             }
-
-            try (ResultSet resultSet = statement.executeQuery()) {
-                int columnCount = resultSet.getMetaData().getColumnCount();
-                while (resultSet.next()) {
-                    List<Object> record = new ArrayList<>();
-                    table.add(record);
-                    for (int i = 1; i <= columnCount; i++) {
-                        record.add(resultSet.getObject(i));
-                    }
-                }
-            }
+            statement.executeUpdate();
+        } catch (SQLException ex) {
+            System.err.println(ex.getMessage());
         }
-        return table.stream().map(List::stream);
+    }
+
+    @Override
+    public void delete(String query, Object... args) {
+        this.update(query, args);
     }
 }
