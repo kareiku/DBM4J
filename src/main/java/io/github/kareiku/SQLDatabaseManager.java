@@ -1,35 +1,15 @@
 package io.github.kareiku;
 
-<<<<<<< HEAD
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-=======
->>>>>>> ae2178c (Remade the SQL-based database manager to follow the CRUD interface)
 import java.sql.*;
 
-public class DatabaseManager implements IDatabaseManager {
+public class SQLDatabaseManager implements DatabaseManager {
     private final String url;
 
-    public DatabaseManager(@NotNull String url) {
+    public SQLDatabaseManager(String url) {
         this.url = url;
     }
 
-    public DatabaseManager(@NotNull String subprotocol, @NotNull String subname) {
-        this.url = String.format("jdbc:%s:%s", subprotocol, subname);
-    }
-
-    private @NotNull Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(this.url);
-    }
-
     @Override
-<<<<<<< HEAD
-    public void update(@NotNull String fmt, @NotNull Object @Nullable ... args) throws SQLException {
-        try (
-                Connection connection = this.getConnection();
-                PreparedStatement statement = connection.prepareStatement(fmt)
-=======
     public void create(String query, Object... args) {
         this.update(query, args);
     }
@@ -39,7 +19,6 @@ public class DatabaseManager implements IDatabaseManager {
         try (
                 Connection connection = DriverManager.getConnection(this.url);
                 PreparedStatement statement = connection.prepareStatement(query)
->>>>>>> ae2178c (Remade the SQL-based database manager to follow the CRUD interface)
         ) {
             for (int i = 0; i < args.length; i++) {
                 statement.setObject(i + 1, args[i]);
@@ -78,18 +57,10 @@ public class DatabaseManager implements IDatabaseManager {
     }
 
     @Override
-<<<<<<< HEAD
-    public @NotNull Stream<@NotNull Stream<?>> fetch(@NotNull String fmt, @NotNull Object @Nullable ... args) throws SQLException {
-        List<List<?>> table = new ArrayList<>();
-        try (
-                Connection connection = this.getConnection();
-                PreparedStatement statement = connection.prepareStatement(fmt)
-=======
     public void update(String query, Object... args) {
         try (
                 Connection connection = DriverManager.getConnection(this.url);
                 PreparedStatement statement = connection.prepareStatement(query)
->>>>>>> ae2178c (Remade the SQL-based database manager to follow the CRUD interface)
         ) {
             for (int i = 0; i < args.length; i++) {
                 statement.setObject(i + 1, args[i]);
